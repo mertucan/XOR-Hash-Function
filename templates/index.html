@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XOR Hash Fonksiyonu</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="content-wrapper">
+        <main>
+            <div class="container">
+                <div class="header">
+                    <h1>XOR Hash Oluşturucu</h1>
+                </div>
+                <p class="subtitle">Bitwise XOR kullanarak 128-bit hash değerleri üreten basit bir araç.</p>
+                
+                <form action="/" method="post">
+                    <label for="message">Mesajınızı girin:</label>
+                    <textarea id="message" name="message" rows="5" placeholder="Metninizi buraya yazın...">{{ message or '' }}</textarea>
+                    <button type="submit">128-bit Hash Hesapla</button>
+                </form>
+
+                {% if hash_code %}
+                <div class="result-box">
+                    <p><strong>Girilen Mesaj:</strong> {{ message }}</p>
+                    <p><strong>Hesaplanan Hash (128-bit):</strong> <br><span class="code">{{ hash_code }}</span></p>
+                </div>
+                {% endif %}
+            </div>
+
+            {% if steps %}
+            <div class="container" id="steps-container-id">
+                <h2>Hesaplama Adımları</h2>
+                {% for step in steps %}
+                    <div class="step">
+                        <h3>{{ step.title }}</h3>
+                        <p>{{ step.explanation }}</p>
+                        
+                        {% if step.char_hex_pairs %}
+                        <div class="details-table-container">
+                            <table class="details-table char-table">
+                                <thead>
+                                    <tr>
+                                        <th>Karakter</th>
+                                        <th>Hex Değeri</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                {% for pair in step.char_hex_pairs %}
+                                    <tr>
+                                        <td>'{{ pair.char }}'</td>
+                                        <td>{{ pair.hex }}</td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        <p style="margin-top: 15px;"><strong>Tam Byte Dizisi:</strong> <span class="code">{{ step.full_hex }}</span></p>
+                        {% endif %}
+                        
+                        {% if step.data %}
+                            <p><span class="code">{{ step.data }}</span></p>
+                        {% endif %}
+                        
+                        {% if step.padded_data %}
+                            <p><strong>Orijinal Veri:</strong> <span class="code">{{ step.original_data }}</span></p>
+                            <p><strong>Dolgu (Padding):</strong> <span class="code">{{ step.padding }}</span></p>
+                            <p><strong>Dolgulu Veri:</strong> <span class="code">{{ step.padded_data }}</span></p>
+                        {% endif %}
+                        
+                        {% if step.blocks %}
+                            <div class="block-list">
+                            {% for block in step.blocks %}
+                                <p><span class="code"><b>Blok {{ loop.index }}:</b> {{ block }}</span></p>
+                            {% endfor %}
+                            </div>
+                        {% endif %}
+
+                        {% if step.xor_steps %}
+                        <div class="details-table-container">
+                            <table class="details-table">
+                                <thead>
+                                    <tr>
+                                        <th>İşlem</th>
+                                        <th>Değer (Hex)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                {% for xor_step in step.xor_steps %}
+                                    <tr>
+                                        <td colspan="2" style="background-color: #333; text-align: center; color: var(--primary-accent);"><b>Blok {{ xor_step.block_num }} XOR İşlemi</b></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Önceki Hash</td>
+                                        <td>{{ xor_step.prev_hash }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Blok {{ xor_step.block_num }}</td>
+                                        <td>{{ xor_step.block_data }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><b>Yeni Hash (Sonuç)</b></td>
+                                        <td><b>{{ xor_step.result_hash }}</b></td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% endif %}
+
+                        {% if loop.last and step.hash_code %}
+                            <p style="margin-top: 15px;"><strong>Final Hash:</strong> <span class="code">{{ step.hash_code }}</span></p>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </main>
+    </div>
+
+</body>
+</html>
